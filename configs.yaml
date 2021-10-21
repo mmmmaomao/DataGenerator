@@ -1,0 +1,33 @@
+CARLA_CONFIG:
+  NUM_OF_VEHICLES: 50
+  NUM_OF_WALKERS: 20
+
+AGENT_CONFIG:
+  TRANSFORM: {location: [70, 13, 0.5], rotation: [0, 180, 0]}
+  BLUEPRINT: vehicle.lincoln.*
+
+SENSOR_CONFIG:
+  RGB:
+    TRANSFORM: {location: [0, 0, 1.6], rotation: [0, 0, 0]}
+    BLUEPRINT: sensor.camera.rgb
+    ATTRIBUTE: {image_size_x: 720, image_size_y: 360, fov: 90}
+
+  DEPTH_RGB:
+    TRANSFORM: { location: [ 0, 0, 1.6 ], rotation: [ 0, 0, 0 ] }
+    BLUEPRINT: sensor.camera.depth
+    ATTRIBUTE: { image_size_x: 720, image_size_y: 360, fov: 90 }
+
+  LIDAR:
+    TRANSFORM: { location: [ 0, 0, 1.6 ], rotation: [ 0, 0, 0 ] }
+    BLUEPRINT: sensor.lidar.ray_cast
+    ATTRIBUTE: {range: 70, rotation_frequency: 20, lower_fov: -45, points_per_second: 1280000, channels: 64}
+
+FILTER_CONFIG:
+  PRELIMINARY_FILTER_DISTANCE: 50
+  MAX_RENDER_DEPTH_IN_METERS: 50
+  MIN_VISIBLE_VERTICES_FOR_RENDER: 3
+  MAX_OUT_VERTICES_FOR_RENDER: 5
+
+SAVE_CONFIG:
+  ROOT_PATH: data/test
+  STEP: 20
