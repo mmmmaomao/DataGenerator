@@ -2,7 +2,7 @@
 
 **简介**
 
-基于CARLA Simulator生成KITTI 2D/3D目标检测数据集格式的仿真数据集。除了对车辆和行人生成Label外，还对仿真环境中的20余种物体生成Label(树木、交通信号灯等。
+基于CARLA Simulator生成KITTI 2D/3D目标检测数据集格式的仿真数据集。除了对车辆和行人生成Label外，还对仿真环境中的20余种物体生成Label(树木、交通信号灯等）。
 
 ![image](https://user-images.githubusercontent.com/55339200/138204888-18958f52-ab1a-454a-8eef-23b7d4987f37.png)
 
