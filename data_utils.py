@@ -4,7 +4,7 @@ import numpy as np
 from numpy.linalg import inv
 
 from config import cfg_from_yaml_file
-from data_descriptor import KittiDescriptor
+from data_descriptor import KittiDescriptor, CarlaDescriptor
 from image_converter import depth_to_array, to_rgb_array
 import math
 from visual_utils import draw_3d_bounding_box
@@ -31,28 +31,32 @@ def objects_filter(data):
         intrinsic = dataDict["intrinsic"]
         extrinsic = dataDict["extrinsic"]
         sensors_data = dataDict["sensor_data"]
-        data_points = []
+        kitti_datapoints = []
+        carla_datapoints = []
         rgb_image = to_rgb_array(sensors_data[0])
         image = rgb_image.copy()
         depth_data = sensors_data[1]
 
         data["agents_data"][agent]["visible_environment_objects"] = []
         for obj in environment_objects:
-            datapoint = is_visible_by_bbox(agent, obj, image, depth_data, intrinsic, extrinsic)
-            if datapoint is not None:
+            kitti_datapoint, carla_datapoint = is_visible_by_bbox(agent, obj, image, depth_data, intrinsic, extrinsic)
+            if kitti_datapoint is not None:
                 data["agents_data"][agent]["visible_environment_objects"].append(obj)
-                data_points.append(datapoint)
+                kitti_datapoints.append(kitti_datapoint)
+                carla_datapoints.append(carla_datapoint)
 
         data["agents_data"][agent]["visible_actors"] = []
 
         for act in actors:
-            datapoint = is_visible_by_bbox(agent, act, image, depth_data, intrinsic, extrinsic)
-            if datapoint is not None:
+            kitti_datapoint, carla_datapoint = is_visible_by_bbox(agent, act, image, depth_data, intrinsic, extrinsic)
+            if kitti_datapoint is not None:
                 data["agents_data"][agent]["visible_actors"].append(act)
-                data_points.append(datapoint)
+                kitti_datapoints.append(kitti_datapoint)
+                carla_datapoints.append(carla_datapoint)
 
         data["agents_data"][agent]["rgb_image"] = image
-        data["agents_data"][agent]["data_points"] = data_points
+        data["agents_data"][agent]["kitti_datapoints"] = kitti_datapoints
+        data["agents_data"][agent]["carla_datapoints"] = carla_datapoints
     return data
 
 
@@ -79,6 +83,12 @@ def is_visible_by_bbox(agent, obj, rgb_image, depth_data, intrinsic, extrinsic):
         else:
             occluded = 2
 
+        velocity = "0 0 0" if isinstance(obj, carla.EnvironmentObject) else\
+            "{} {} {}".format(obj.get_velocity().x, obj.get_velocity().y, obj.get_velocity().z)
+        acceleration = "0 0 0" if isinstance(obj, carla.EnvironmentObject) else \
+            "{} {} {}".format(obj.get_acceleration().x, obj.get_acceleration().y, obj.get_acceleration().z)
+        angular_velocity = "0 0 0" if isinstance(obj, carla.EnvironmentObject) else\
+            "{} {} {}".format(obj.get_angular_velocity().x, obj.get_angular_velocity().y, obj.get_angular_velocity().z)
         # draw_3d_bounding_box(rgb_image, vertices_pos2d)
 
         kitti_data = KittiDescriptor()
@@ -89,8 +99,14 @@ def is_visible_by_bbox(agent, obj, rgb_image, depth_data, intrinsic, extrinsic):
         kitti_data.set_type(obj_tp)
         kitti_data.set_3d_object_location(midpoint)
         kitti_data.set_rotation_y(rotation_y)
-        return kitti_data
-    return None
+
+        carla_data = CarlaDescriptor()
+        carla_data.set_type(obj_tp)
+        carla_data.set_velocity(velocity)
+        carla_data.set_acceleration(acceleration)
+        carla_data.set_angular_velocity(angular_velocity)
+        return kitti_data, carla_data
+    return None, None
 
 def obj_type(obj):
     if isinstance(obj, carla.EnvironmentObject):

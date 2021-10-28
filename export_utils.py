@@ -36,9 +36,6 @@ def save_lidar_data(filename, point_cloud, format="bin"):
         |  /
         | /
         |/____> y
-        This is a left-handed coordinate system, with x being forward, y to the right and z up
-        See also https://github.com/carla-simulator/carla/issues/498
-        However, the lidar coordinate system from KITTI is defined as
               z
               ^   ^ x
               |  /
@@ -70,7 +67,7 @@ def save_lidar_data(filename, point_cloud, format="bin"):
         lidar_array.tofile(filename)
 
 
-def save_kitti_data(filename, datapoints):
+def save_label_data(filename, datapoints):
     with open(filename, 'w') as f:
         out_str = "\n".join([str(point) for point in datapoints if point])
         f.write(out_str)
